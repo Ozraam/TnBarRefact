@@ -1,29 +1,21 @@
 <script lang="ts">
     import { Meal } from "$lib/MealManager";
-    let { meal } : { meal: Meal} = $props();
+    let { 
+        meal,
+        horizontal = false 
+    } : { meal: Meal, horizontal: boolean} = $props();
 </script>
 
-<div class="flex items-center flex-col">
+<div class="flex items-center flex-col w-full">
                 {#if meal.isText}
-                    <p class="text-center font-bold text-2xl mt-10">
+                    <p class="w-full text-center font-bold {horizontal ? "text-3xl" : "text-2xl"} mt-10">
                         {meal.name}
                     </p>
                 {:else}
-                    <img src="/Sandwichlogo/{meal.image}.png" class="w-10/12 -m-2" alt="">
-                    <p class="text-center font-bold text-2xl">
+                    <img src="/Sandwichlogo/{meal.image}.png" class="w-10/12 -m-3" alt="">
+                    <p class="w-full text-center font-bold {horizontal ? "text-4xl" : "text-[1.30rem]"}">
                         {meal.name}
                     </p>
                 {/if}
             </div>
-
-<style>
-    @font-face {
-		font-family: 'MenuFont';
-		src: url('/OpenSans-VariableFont_wdth,wght.ttf') format('truetype');
-		font-display: swap;
-	}
-    * {
-        font-family: 'MenuFont', sans-serif;
-    }
-</style>
 

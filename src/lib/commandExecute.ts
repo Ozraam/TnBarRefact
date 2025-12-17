@@ -1,8 +1,11 @@
 import { MealManager, Meal } from "$lib/MealManager";
-import { headers, dayAlias } from "$lib/constants";
+import { headers, dayAlias, FrontState } from "$lib/constants";
+import { toPng } from 'html-to-image';
 
-interface LoadingState {
+export interface CommandContext {
     setLoading: (loading: boolean) => void;
+    setFrontState?: (state: string) => void;
+    currentState?: string;
 }
 
 function resolveDayIndex(token: string): number {
@@ -16,7 +19,7 @@ function resolveDayIndex(token: string): number {
     return headers.findIndex(h => h.toLowerCase() === label);
 }
 
-export function executeCommand(command: string, loadingObserver: LoadingState): { success: boolean; message: string } {
+export function executeCommand(command: string, context: CommandContext): { success: boolean; message: string } {
     const manager = MealManager.getInstance();
     if (!manager.currentMenu) {
         return {
@@ -28,12 +31,65 @@ export function executeCommand(command: string, loadingObserver: LoadingState): 
     const trimmed = command.trim();
     const normalizedCommand = trimmed.toLowerCase();
 
+    if (normalizedCommand === 'view-vertical' || normalizedCommand === 'view-v') {
+        if (context.setFrontState) {
+            context.setFrontState(FrontState.VERTICAL);
+            return { success: true, message: 'Switched to Vertical View' };
+        }
+    }
+
+    if (normalizedCommand === 'view-horizontal' || normalizedCommand === 'view-h') {
+        if (context.setFrontState) {
+            context.setFrontState(FrontState.HORIZONTAL);
+            return { success: true, message: 'Switched to Horizontal View' };
+        }
+    }
+
+    if (normalizedCommand === 'view-mail' || normalizedCommand === 'view-m') {
+        if (context.setFrontState) {
+            context.setFrontState(FrontState.MAIL);
+            return { success: true, message: 'Switched to Mail View' };
+        }
+    }
+
     if (normalizedCommand === 'generate' || normalizedCommand === 'gen') {
         // Generation logic is not yet implemented in this project
         return {
             success: false,
             message: 'Generation feature is not available.'
         };
+    }
+
+    if (normalizedCommand === 'screenshot' || normalizedCommand === 'shot') {
+        const targetId = context.currentState === FrontState.HORIZONTAL ? 'menu-horizontal' : 'menu-vertical';
+        const element = document.getElementById(targetId);
+        
+        if (element) {
+            toPng(element, { 
+                cacheBust: true, 
+                pixelRatio: 2, 
+                skipFonts: true,
+                width: element.clientWidth,
+                height: element.clientHeight,
+                style: {
+                    transform: 'none',
+                    margin: '0'
+                }
+            })
+                .then((dataUrl) => {
+                    const link = document.createElement('a');
+                    link.download = `menu-${context.currentState || 'view'}.png`;
+                    link.href = dataUrl;
+                    link.click();
+                })
+                .catch((err) => {
+                    console.error('Screenshot failed:', err);
+                });
+            
+            return { success: true, message: 'Screenshot started...' };
+        } else {
+             return { success: false, message: 'Menu element not found.' };
+        }
     }
 
     const clearMatch = trimmed.match(/^([a-zA-Z]+)-(u|l)-(clear|empty|reset)$/i);

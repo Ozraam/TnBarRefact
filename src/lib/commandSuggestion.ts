@@ -74,6 +74,10 @@ export function commandPaletteSuggestions(input: string) {
         const baseToken = combos[0]?.combo.split('-')[0] || 'mon';
         return [
             'generate',
+            'view-vertical',
+            'view-horizontal',
+            'view-mail',
+            'screenshot',
             `${baseToken}-u-s <sandwich name>`,
             `${baseToken}-u-t <your text>`,
             `${baseToken}-u-clear`
@@ -85,7 +89,7 @@ export function commandPaletteSuggestions(input: string) {
     const suggestions: string[] = [];
 
     if (!hasSpace) {
-        ['generate', 'gen'].forEach((token) => {
+        ['generate', 'gen', 'view-vertical', 'view-horizontal', 'view-mail', 'screenshot'].forEach((token) => {
             if (token.startsWith(normalized)) {
                 suggestions.push(token);
             }

@@ -1,3 +1,4 @@
+
 export const headers = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "PUB"];
 
 export const dayAlias: Record<string, string> = {
@@ -8,3 +9,9 @@ export const dayAlias: Record<string, string> = {
     v: "vendredi", ven: "vendredi", fri: "vendredi", friday: "vendredi",
     p: "pub",
 };
+
+export const FrontState = {
+    VERTICAL: "vertical",
+    HORIZONTAL: "horizontal",
+    MAIL: "mail",
+}
